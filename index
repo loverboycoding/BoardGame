@@ -40,83 +40,124 @@
                 <input id="entireSearch" type="text" placeholder="Search here" class="form-control" style="width: 300px; display: inline-block; margin-left: 10px;">
             </b>
 
-            <!-- board game table details -->
-            <div class="table-wrapper mt-3">
-                <table class="table table-striped table-hover table-bordered align-middle">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Year Published</th>
-                            <th>Minimum Player(s)</th>
-                            <th>Maximum Player(s)</th>
-                            <th>ComAgeRec</th>
-                            <th>LanguageEase</th>
-                            <th>BestPlayers</th>
-                            <th>NumOwned</th>
-                            <th>NumWant</th>
-                            <th>NumWish</th>
-                            <th>MfgPlaytime</th>
-                            <th>ComMinPlayTime</th>
-                            <th>ComMaxPlayTime</th>
-                            <th>MfgAgeRec</th>
-                            <th>NumAlternates</th>
-                            <th>NumExpansions</th>
-                            <th>NumImplementations</th>
-                            <th>Family</th>
-                            <th>ImagePath</th>
-                            <th>RankInboardgame</th>
-                            <th>RankInstrategygames</th>
-                            <th>RankInfamilygames</th>
-                            <th>RankInthematic</th>
-                        </tr>
-                    </thead>
+            <!-- view buttons -->
+            <div style="margin-top:10px;"
+                 <b>View:</b>
+            <button id="tableViewBtn" class="btn btn-primary btn-sm">Table</button>
+            <button id="cardViewBtn" class="btn btn-secondary btn-sm">Card</button>
+            </div>
 
-                    <tbody id="content">
-                        @foreach (var row in db.Query(selectQueryString))
-                        {
+            <!-- board game table details -->
+            <div id="tableView">
+                <div class="table-wrapper mt-3">
+                    <table class="table table-striped table-hover table-bordered align-middle">
+                        <thead>
                             <tr>
-                                <td>@row.Name</td>
-                                <td>@row.Description</td>
-                                <td>@row.YearPublished</td>
-                                <td>@row.MinPlayers</td>
-                                <td>@row.MaxPlayers</td>
-                                <td>@row.ComAgeRec</td>
-                                <td>@row.LanguageEase</td>
-                                <td>@row.BestPlayers</td>
-                                <td>@row.NumOwned</td>
-                                <td>@row.NumWant</td>
-                                <td>@row.NumWish</td>
-                                <td>@row.MfgPlaytime</td>
-                                <td>@row.ComMinPlayTime</td>
-                                <td>@row.ComMaxPlayTime</td>
-                                <td>@row.MfgAgeRec</td>
-                                <td>@row.NumAlternates</td>
-                                <td>@row.NumExpansions</td>
-                                <td>@row.NumImplementations</td>
-                                <td>@row.Family</td>
-                                <td>@row.ImagePath</td>
-                                <td>@row.RankInboardgame</td>
-                                <td>@row.RankInstrategygames</td>
-                                <td>@row.RankInfamilygames</td>
-                                <td>@row.RankInthematic</td>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Year Published</th>
+                                <th>Minimum Player(s)</th>
+                                <th>Maximum Player(s)</th>
+                                <th>ComAgeRec</th>
+                                <th>LanguageEase</th>
+                                <th>BestPlayers</th>
+                                <th>NumOwned</th>
+                                <th>NumWant</th>
+                                <th>NumWish</th>
+                                <th>MfgPlaytime</th>
+                                <th>ComMinPlayTime</th>
+                                <th>ComMaxPlayTime</th>
+                                <th>MfgAgeRec</th>
+                                <th>NumAlternates</th>
+                                <th>NumExpansions</th>
+                                <th>NumImplementations</th>
+                                <th>Family</th>
+                                <th>ImagePath</th>
+                                <th>RankInboardgame</th>
+                                <th>RankInstrategygames</th>
+                                <th>RankInfamilygames</th>
+                                <th>RankInthematic</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody id="content">
+                            @foreach (var row in db.Query(selectQueryString))
+                            {
+                                <tr>
+                                    <td>@row.Name</td>
+                                    <td>@row.Description</td>
+                                    <td>@row.YearPublished</td>
+                                    <td>@row.MinPlayers</td>
+                                    <td>@row.MaxPlayers</td>
+                                    <td>@row.ComAgeRec</td>
+                                    <td>@row.LanguageEase</td>
+                                    <td>@row.BestPlayers</td>
+                                    <td>@row.NumOwned</td>
+                                    <td>@row.NumWant</td>
+                                    <td>@row.NumWish</td>
+                                    <td>@row.MfgPlaytime</td>
+                                    <td>@row.ComMinPlayTime</td>
+                                    <td>@row.ComMaxPlayTime</td>
+                                    <td>@row.MfgAgeRec</td>
+                                    <td>@row.NumAlternates</td>
+                                    <td>@row.NumExpansions</td>
+                                    <td>@row.NumImplementations</td>
+                                    <td>@row.Family</td>
+                                    <td>@row.RankInboardgame</td>
+                                    <td>@row.RankInstrategygames</td>
+                                    <td>@row.RankInfamilygames</td>
+                                    <td>@row.RankInthematic</td>
+                                    <td><img src=@row.ImagePath /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <!--search script -->
-        <script>
-            $(function () {
-                $("#entireSearch").on("keyup", function () {
-                    var value = $(this).val().toLowerCase();
-                    $("#content tr").filter(function () {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                    });
-                });
-            });
-        </script>
-    </body>
+
+        <!-- card layout -->
+        <div class="container my-4">
+            <div class="row justify-content-center">
+                @foreach (var row in db.Query(selectQueryString))
+                {
+                    <div class="col-md-4 d-flex justify-content-center mb-4">
+                        <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
+                            <!-- image -->
+                            <img src=@row.ImagePath class="card-img-top" alt=@row.Name>
+
+                            <!-- card body -->
+                            <div class="card-body">
+                                <h5 class="card-title">@row.Name</h5>
+                                <p class="card-text">@row.Description</p>
+                            </div>
+
+                            <!-- Game Details -->
+                            <ul class="list-group list-group-flush text-start">
+                                <li class="list-group-item"><b>Year:</b> @row.YearPublished</li>
+                                <li class="list-group-item"><b>Players:</b> @row.MinPlayers - @row.MaxPlayers</li>
+                                <li class="list-group-item"><b>Age Rec:</b> @row.ComAgeRec</li>
+                                <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime mins</li>
+                                <li class="list-group-item"><b>Family:</b> @row.Family</li>
+                                <li class="list-group-item"><b>Rank:</b> @row.RankInboardgame</li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+                        </div>
+
+                        <!--search script -->
+                        <script>
+                            $(function () {
+                                $("#entireSearch").on("keyup", function () {
+                                    var value = $(this).val().toLowerCase();
+                                    $("#content tr").filter(function () {
+                                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                                    });
+                                });
+                            });
+                        </script>
+</body>
 </html>
 </main>
