@@ -6,8 +6,13 @@
 @using WebMatrix.Data
 
 @{
+    <!-- accessing board game table and sql-->
     var db = Database.Open("BoardGame");
     var selectQueryString = "SELECT * FROM BoardGame ORDER BY Name";
+
+    <!-- accessing category table and sql -->
+    var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
+    var categories = db.Query(categoryQuery);
 }
 
 <main>
@@ -40,6 +45,19 @@
                 Search Board Games:
                 <input id="entireSearch" type="text" placeholder="Search here" class="form-control" style="width: 300px; display: inline-block; margin-left: 10px;">
             </b>
+
+            <!-- dropdown box -->
+            <div class="dropdown">
+                <button onclick="myFunction()" class="dropbtn">Category</button>
+                <div id="myDropdown" class="dropdown-content">
+
+                    @foreach (var row in db.Query(categoryQuery))
+                        {
+                            <button type="button">@row.Category"</button>
+                        }
+
+                    </div>
+            </div>
 
             <!-- view buttons -->
             <div style="margin-top:10px;">
@@ -150,6 +168,28 @@
             <!--search script -->
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
             <script>
+
+
+                //drop box
+                function myFunction() {
+                    document.getElementById("myDropdown").classList.toggle("show");
+                }
+
+                function filterFunction() {
+                    const input = document.getElementById("myInput");
+                    const filter = input.value.toUpperCase();
+                    const div = document.getElementById("myDropdown");
+                    const a = div.getElementsByTagName("a");
+                    for (let i = 0; i < a.length; i++) {
+                        txtValue = a[i].textContent || a[i].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            a[i].style.display = "";
+                        } else {
+                            a[i].style.display = "none";
+                        }
+                    }
+                }
+
 
                 //table search script
                 $(function () {
