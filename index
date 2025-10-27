@@ -29,8 +29,9 @@
                 overflow-y: auto;
             }
         </style>
-    </head>
-    <body>
+
+
+
         <div class="container">
             <h1>Board Games</h1>
 
@@ -41,10 +42,10 @@
             </b>
 
             <!-- view buttons -->
-            <div style="margin-top:10px;"
-                 <b>View:</b>
-            <button id="showTable" class="btn btn-primary btn-sm">Table</button>
-            <button id="showCards" class="btn btn-secondary btn-sm">Card</button>
+            <div style="margin-top:10px;">
+                <b>View:</b>
+                <button id="showTable" class="btn btn-primary btn-sm" onclick="showTable()">Table</button>
+                <button id="showCards" class="btn btn-secondary btn-sm" onclick="showCards()">Card</button>
             </div>
 
             <!-- board game table details -->
@@ -72,11 +73,11 @@
                                 <th>NumExpansions</th>
                                 <th>NumImplementations</th>
                                 <th>Family</th>
-                                <th>ImagePath</th>
                                 <th>RankInboardgame</th>
                                 <th>RankInstrategygames</th>
                                 <th>RankInfamilygames</th>
                                 <th>RankInthematic</th>
+                                <th>Image</th>
                             </tr>
                         </thead>
 
@@ -107,108 +108,116 @@
                                     <td>@row.RankInstrategygames</td>
                                     <td>@row.RankInfamilygames</td>
                                     <td>@row.RankInthematic</td>
-                                    <td><img src=@row.ImagePath /></td>
+                                    <td><img src="@row.ImagePath" alt="@row.Name" style="max-width:80px; border-radius:8px;"></td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- card layout -->
-        <div id="cardView" class="container my-4">
-            <div id="cardContent" class="row justify-content-center">
-                @foreach (var row in db.Query(selectQueryString))
-                {
-                    <div class="col-md-4 d-flex justify-content-center mb-4">
-                        <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
-                            <!-- image -->
-                            <img src=@row.ImagePath class="card-img-top" alt=@row.Name>
+            <!-- card layout -->
+            <div id="cardView" class="container my-4">
+                <div id="cardContent" class="row justify-content-center">
+                    @foreach (var row in db.Query(selectQueryString))
+                    {
+                        <div class="col-md-4 d-flex justify-content-center mb-4">
+                            <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
+                                <!-- image -->
+                                <img src="@row.ImagePath" class="card-img-top" alt="@row.Name">
 
-                            <!-- card body -->
-                            <div class="card-body">
-                                <h5 class="card-title">@row.Name</h5>
-                                <p class="card-text">@row.Description</p>
+                                <!-- card body -->
+                                <div class="card-body">
+                                    <h5 class="card-title">@row.Name</h5>
+                                    <p class="card-text">@row.Description</p>
+                                </div>
+
+                                <!-- Game Details -->
+                                <ul class="list-group list-group-flush text-start">
+                                    <li class="list-group-item"><b>Year:</b> @row.YearPublished</li>
+                                    <li class="list-group-item"><b>Players:</b> @row.MinPlayers - @row.MaxPlayers</li>
+                                    <li class="list-group-item"><b>Age Rec:</b> @row.ComAgeRec</li>
+                                    <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime</li>
+                                    <li class="list-group-item"><b>Family:</b> @row.Family</li>
+                                    <li class="list-group-item"><b>Rank:</b> @row.RankInboardgame</li>
+                                </ul>
                             </div>
-
-                            <!-- Game Details -->
-                            <ul class="list-group list-group-flush text-start">
-                                <li class="list-group-item"><b>Year:</b> @row.YearPublished</li>
-                                <li class="list-group-item"><b>Players:</b> @row.MinPlayers - @row.MaxPlayers</li>
-                                <li class="list-group-item"><b>Age Rec:</b> @row.ComAgeRec</li>
-                                <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime</li>
-                                <li class="list-group-item"><b>Family:</b> @row.Family</li>
-                                <li class="list-group-item"><b>Rank:</b> @row.RankInboardgame</li>
-                            </ul>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
 
-        <!--search script -->
-        <script>
+            <!--search script -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+            <script>
 
-            //table search script
-            $(function () {
-                $("#entireSearch").on("keyup", function () {
-                    // Get search input and convert to lowercase
-                    var value = $(this).val().toLowerCase();
-
-                    // Loop through each row in the table
-                    $("#content tr").filter(function () {
-                        // Get the text content from the first column (Name column)
-                        var name = $(this).find("td:first").text().toLowerCase();
-
-                        // Show the row only if the Name column matches the search value
-                        $(this).toggle(name.indexOf(value) > -1);  // Toggle based on match
+                //table search script
+                $(function () {
+                    $("#entireSearch").on("keyup", function () {
+                        var value = $(this).val().toLowerCase();
+                        $("#content tr").filter(function () {
+                            var name = $(this).find("td:first").text().toLowerCase();
+                            $(this).toggle(name.indexOf(value) > -1);
+                        });
                     });
                 });
-            });
 
-            //card search script
-            $(function () {
-                $("#entireSearch").on("keyup", function () {
-                    // Get search input and convert to lowercase
-                    var value = $(this).val().toLowerCase();
-
-                    // Loop through each row for cards
-                    $("#cardContent .card").filter(function () {
-                        var name = $(this).find(".card-title").text().toLowerCase();
-                        $(this).toggle(name.indexOf(value) > -1);
+                //card search script
+                $(function () {
+                    $("#entireSearch").on("keyup", function () {
+                        var value = $(this).val().toLowerCase();
+                        $("#cardContent .card").filter(function () {
+                            var name = $(this).find(".card-title").text().toLowerCase();
+                            $(this).toggle(name.indexOf(value) > -1);
+                        });
                     });
                 });
-            });
 
+                // View toggle script
 
-            // View toggle script
-
-            // Default: show table, hide cards
-            document.getElementById("cardView").style.display = "none";
-
-            function showTable() {
-                document.getElementById("tableView").style.display = "block";
+                // Default: show table, hide cards
                 document.getElementById("cardView").style.display = "none";
-                document.getElementById("tableViewBtn").classList.add("btn-primary");
-                document.getElementById("tableViewBtn").classList.remove("btn-secondary");
-                document.getElementById("cardViewBtn").classList.add("btn-secondary");
-                document.getElementById("cardViewBtn").classList.remove("btn-primary");
-            }
 
-            function showCards() {
-                document.getElementById("cardView").style.display = "block";
-                document.getElementById("tableView").style.display = "none";
-                document.getElementById("cardViewBtn").classList.add("btn-primary");
-                document.getElementById("cardViewBtn").classList.remove("btn-secondary");
-                document.getElementById("tableViewBtn").classList.add("btn-secondary");
-                document.getElementById("tableViewBtn").classList.remove("btn-primary");
-            }
+                function showTable() {
+                    document.getElementById("tableView").style.display = "block";
+                    document.getElementById("cardView").style.display = "none";
+                    document.getElementById("showTable").classList.add("btn-primary");
+                    document.getElementById("showTable").classList.remove("btn-secondary");
+                    document.getElementById("showCards").classList.add("btn-secondary");
+                    document.getElementById("showCards").classList.remove("btn-primary");
+                }
 
+                function showCards() {
+                    document.getElementById("cardView").style.display = "block";
+                    document.getElementById("tableView").style.display = "none";
+                    document.getElementById("showCards").classList.add("btn-primary");
+                    document.getElementById("showCards").classList.remove("btn-secondary");
+                    document.getElementById("showTable").classList.add("btn-secondary");
+                    document.getElementById("showTable").classList.remove("btn-primary");
+                }
+            </script>
 
+            <style>
+                h1 {
+                    margin-bottom: 20px;
+                }
 
+                table img {
+                    max-width: 80px;
+                    border-radius: 8px;
+                }
 
-        </script>
-    </body>
-</html>
+                .table-wrapper {
+                    max-height: 600px;
+                    overflow-y: auto;
+                }
+
+                .card img {
+                    max-height: 200px;
+                    object-fit: cover;
+                }
+            </style>
+        </div>
+    </head>
+    <body>
 </main>
