@@ -43,8 +43,8 @@
             <!-- view buttons -->
             <div style="margin-top:10px;"
                  <b>View:</b>
-            <button id="tableViewBtn" class="btn btn-primary btn-sm">Table</button>
-            <button id="cardViewBtn" class="btn btn-secondary btn-sm">Card</button>
+            <button id="showTable" class="btn btn-primary btn-sm">Table</button>
+            <button id="showCards" class="btn btn-secondary btn-sm">Card</button>
             </div>
 
             <!-- board game table details -->
@@ -117,7 +117,7 @@
         </div>
 
         <!-- card layout -->
-        <div class="container my-4">
+        <div id="cardView" class="container my-4">
             <div class="row justify-content-center">
                 @foreach (var row in db.Query(selectQueryString))
                 {
@@ -137,7 +137,7 @@
                                 <li class="list-group-item"><b>Year:</b> @row.YearPublished</li>
                                 <li class="list-group-item"><b>Players:</b> @row.MinPlayers - @row.MaxPlayers</li>
                                 <li class="list-group-item"><b>Age Rec:</b> @row.ComAgeRec</li>
-                                <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime mins</li>
+                                <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime</li>
                                 <li class="list-group-item"><b>Family:</b> @row.Family</li>
                                 <li class="list-group-item"><b>Rank:</b> @row.RankInboardgame</li>
                             </ul>
@@ -145,19 +145,46 @@
                     </div>
                 }
             </div>
-                        </div>
+        </div>
 
-                        <!--search script -->
-                        <script>
-                            $(function () {
-                                $("#entireSearch").on("keyup", function () {
-                                    var value = $(this).val().toLowerCase();
-                                    $("#content tr").filter(function () {
-                                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                                    });
-                                });
-                            });
-                        </script>
-</body>
+        <!--search script -->
+        <script>
+            $(function () {
+                $("#entireSearch").on("keyup", function () {
+                    var value = $(this).val().toLowerCase();
+                    $("#content tr").filter(function () {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                    });
+                });
+            });
+
+            // View toggle script
+
+            // Default: show table, hide cards
+            document.getElementById("cardView").style.display = "none";
+
+            function showTable() {
+                document.getElementById("tableView").style.display = "block";
+                document.getElementById("cardView").style.display = "none";
+                document.getElementById("tableViewBtn").classList.add("btn-primary");
+                document.getElementById("tableViewBtn").classList.remove("btn-secondary");
+                document.getElementById("cardViewBtn").classList.add("btn-secondary");
+                document.getElementById("cardViewBtn").classList.remove("btn-primary");
+            }
+
+            function showCards() {
+                document.getElementById("cardView").style.display = "block";
+                document.getElementById("tableView").style.display = "none";
+                document.getElementById("cardViewBtn").classList.add("btn-primary");
+                document.getElementById("cardViewBtn").classList.remove("btn-secondary");
+                document.getElementById("tableViewBtn").classList.add("btn-secondary");
+                document.getElementById("tableViewBtn").classList.remove("btn-primary");
+            }
+
+
+
+
+        </script>
+    </body>
 </html>
 </main>
