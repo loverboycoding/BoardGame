@@ -118,7 +118,7 @@
 
         <!-- card layout -->
         <div id="cardView" class="container my-4">
-            <div class="row justify-content-center">
+            <div id="cardContent" class="row justify-content-center">
                 @foreach (var row in db.Query(selectQueryString))
                 {
                     <div class="col-md-4 d-flex justify-content-center mb-4">
@@ -149,14 +149,38 @@
 
         <!--search script -->
         <script>
+
+            //table search script
             $(function () {
                 $("#entireSearch").on("keyup", function () {
+                    // Get search input and convert to lowercase
                     var value = $(this).val().toLowerCase();
+
+                    // Loop through each row in the table
                     $("#content tr").filter(function () {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                        // Get the text content from the first column (Name column)
+                        var name = $(this).find("td:first").text().toLowerCase();
+
+                        // Show the row only if the Name column matches the search value
+                        $(this).toggle(name.indexOf(value) > -1);  // Toggle based on match
                     });
                 });
             });
+
+            //card search script
+            $(function () {
+                $("#entireSearch").on("keyup", function () {
+                    // Get search input and convert to lowercase
+                    var value = $(this).val().toLowerCase();
+
+                    // Loop through each row for cards
+                    $("#cardContent .card").filter(function () {
+                        var name = $(this).find(".card-title").text().toLowerCase();
+                        $(this).toggle(name.indexOf(value) > -1);
+                    });
+                });
+            });
+
 
             // View toggle script
 
