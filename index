@@ -6,11 +6,43 @@
 @using WebMatrix.Data
 
 @{
-    <!-- accessing board game table and sql-->
+    <!-- accessing joined data between BoardGame, GameCategory, and Category -->
     var db = Database.Open("BoardGame");
-    var selectQueryString = "SELECT * FROM BoardGame ORDER BY Name";
 
-    <!-- accessing category table and sql -->
+    
+    var selectQueryString = @"
+    SELECT
+        b.Name,
+        b.Description,
+        b.YearPublished,
+        b.MinPlayers,
+        b.MaxPlayers,
+        b.ComAgeRec,
+        b.LanguageEase,
+        b.BestPlayers,
+        b.NumOwned,
+        b.NumWant,
+        b.NumWish,
+        b.MfgPlaytime,
+        b.ComMinPlayTime,
+        b.ComMaxPlayTime,
+        b.MfgAgeRec,
+        b.NumAlternates,
+        b.NumExpansions,
+        b.NumImplementations,
+        b.Family,
+        b.RankInboardgame,
+        b.RankInstrategygames,
+        b.RankInfamilygames,
+        b.RankInthematic,
+        c.Category AS Category,
+        b.ImagePath
+        FROM GameCategory AS gc
+        INNER JOIN Category AS c ON gc.Category = c.CategoryID
+        INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
+        ORDER BY b.Name";
+
+    <!-- category buttons query -->
     var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
     var categories = db.Query(categoryQuery);
 }
@@ -33,6 +65,34 @@
                 max-height: 600px;
                 overflow-y: auto;
             }
+
+
+            .card img {
+                max-height: 200px;
+                object-fit: cover;
+            }
+
+
+
+            .category-buttons {
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+
+                .category-buttons button {
+                    margin: 3px;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    border: 1px solid #007bff;
+                    background-color: white;
+                    color: #007bff;
+                    cursor: pointer;
+                }
+
+                    .category-buttons button.active {
+                        background-color: #007bff;
+                        color: white;
+                    }
         </style>
 
 
@@ -46,17 +106,13 @@
                 <input id="entireSearch" type="text" placeholder="Search here" class="form-control" style="width: 300px; display: inline-block; margin-left: 10px;">
             </b>
 
-            <!-- dropdown box -->
-            <div class="dropdown">
-                <button onclick="myFunction()" class="dropbtn">Category</button>
-                <div id="myDropdown" class="dropdown-content">
-
-                    @foreach (var row in db.Query(categoryQuery))
-                        {
-                            <button type="button">@row.Category"</button>
-                        }
-
-                    </div>
+            <!-- category filter buttons -->
+            <div class="category-buttons">
+                <b>Filter by Category:</b><br />
+                @foreach (var row in categories)
+                {
+                    <button class="category-btn" data-category="@row.Category">@row.Category</button>
+                }
             </div>
 
             <!-- view buttons -->
@@ -95,6 +151,7 @@
                                 <th>RankInstrategygames</th>
                                 <th>RankInfamilygames</th>
                                 <th>RankInthematic</th>
+                                <th>Category</th>
                                 <th>Image</th>
                             </tr>
                         </thead>
@@ -102,7 +159,7 @@
                         <tbody id="content">
                             @foreach (var row in db.Query(selectQueryString))
                             {
-                                <tr>
+                                <tr data-category="@row.Category">
                                     <td>@row.Name</td>
                                     <td>@row.Description</td>
                                     <td>@row.YearPublished</td>
@@ -126,6 +183,7 @@
                                     <td>@row.RankInstrategygames</td>
                                     <td>@row.RankInfamilygames</td>
                                     <td>@row.RankInthematic</td>
+                                    <td>@row.Category</td>
                                     <td><img src="@row.ImagePath" alt="@row.Name" style="max-width:80px; border-radius:8px;"></td>
                                 </tr>
                             }
@@ -139,24 +197,22 @@
                 <div id="cardContent" class="row justify-content-center">
                     @foreach (var row in db.Query(selectQueryString))
                     {
-                        <div class="col-md-4 d-flex justify-content-center mb-4">
+                        <div class="col-md-4 d-flex justify-content-center mb-4 card-item" data-category="@row.Category">
                             <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
-                                <!-- image -->
                                 <img src="@row.ImagePath" class="card-img-top" alt="@row.Name">
 
-                                <!-- card body -->
                                 <div class="card-body">
                                     <h5 class="card-title">@row.Name</h5>
                                     <p class="card-text">@row.Description</p>
                                 </div>
 
-                                <!-- Game Details -->
                                 <ul class="list-group list-group-flush text-start">
                                     <li class="list-group-item"><b>Year:</b> @row.YearPublished</li>
                                     <li class="list-group-item"><b>Players:</b> @row.MinPlayers - @row.MaxPlayers</li>
                                     <li class="list-group-item"><b>Age Rec:</b> @row.ComAgeRec</li>
                                     <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime</li>
                                     <li class="list-group-item"><b>Family:</b> @row.Family</li>
+                                    <li class="list-group-item"><b>Category:</b> @row.Category</li>
                                     <li class="list-group-item"><b>Rank:</b> @row.RankInboardgame</li>
                                 </ul>
                             </div>
@@ -165,31 +221,27 @@
                 </div>
             </div>
 
-            <!--search script -->
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+            <!--search and filter script -->
             <script>
 
+                // category button filter
+                $(".category-btn").on("click", function () {
+                    var selected = $(this).data("category");
+                    $(".category-btn").removeClass("active");
+                    $(this).addClass("active");
 
-                //drop box
-                function myFunction() {
-                    document.getElementById("myDropdown").classList.toggle("show");
-                }
+                    // table filter
+                    $("#content tr").each(function () {
+                        var cat = $(this).data("category");
+                        $(this).toggle(cat === selected || selected === "All");
+                    });
 
-                function filterFunction() {
-                    const input = document.getElementById("myInput");
-                    const filter = input.value.toUpperCase();
-                    const div = document.getElementById("myDropdown");
-                    const a = div.getElementsByTagName("a");
-                    for (let i = 0; i < a.length; i++) {
-                        txtValue = a[i].textContent || a[i].innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            a[i].style.display = "";
-                        } else {
-                            a[i].style.display = "none";
-                        }
-                    }
-                }
-
+                    // card filter
+                    $("#cardContent .card-item").each(function () {
+                        var cat = $(this).data("category");
+                        $(this).toggle(cat === selected || selected === "All");
+                    });
+                });
 
                 //table search script
                 $(function () {
@@ -213,9 +265,7 @@
                     });
                 });
 
-                // View toggle script
-
-                // Default: show table, hide cards
+                // View toggle between table and card script
                 document.getElementById("cardView").style.display = "none";
 
                 function showTable() {
@@ -235,28 +285,10 @@
                     document.getElementById("showTable").classList.add("btn-secondary");
                     document.getElementById("showTable").classList.remove("btn-primary");
                 }
+
             </script>
 
-            <style>
-                h1 {
-                    margin-bottom: 20px;
-                }
-
-                table img {
-                    max-width: 80px;
-                    border-radius: 8px;
-                }
-
-                .table-wrapper {
-                    max-height: 600px;
-                    overflow-y: auto;
-                }
-
-                .card img {
-                    max-height: 200px;
-                    object-fit: cover;
-                }
-            </style>
+            
         </div>
     </head>
     <body>
