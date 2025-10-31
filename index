@@ -9,38 +9,38 @@
     <!-- accessing joined data between BoardGame, GameCategory, and Category -->
     var db = Database.Open("BoardGame");
 
-    
+
     var selectQueryString = @"
-    SELECT
-        b.Name,
-        b.Description,
-        b.YearPublished,
-        b.MinPlayers,
-        b.MaxPlayers,
-        b.ComAgeRec,
-        b.LanguageEase,
-        b.BestPlayers,
-        b.NumOwned,
-        b.NumWant,
-        b.NumWish,
-        b.MfgPlaytime,
-        b.ComMinPlayTime,
-        b.ComMaxPlayTime,
-        b.MfgAgeRec,
-        b.NumAlternates,
-        b.NumExpansions,
-        b.NumImplementations,
-        b.Family,
-        b.RankInboardgame,
-        b.RankInstrategygames,
-        b.RankInfamilygames,
-        b.RankInthematic,
-        c.Category AS Category,
-        b.ImagePath
-        FROM GameCategory AS gc
-        INNER JOIN Category AS c ON gc.Category = c.CategoryID
-        INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
-        ORDER BY b.Name";
+SELECT
+b.Name,
+b.Description,
+b.YearPublished,
+b.MinPlayers,
+b.MaxPlayers,
+b.ComAgeRec,
+b.LanguageEase,
+b.BestPlayers,
+b.NumOwned,
+b.NumWant,
+b.NumWish,
+b.MfgPlaytime,
+b.ComMinPlayTime,
+b.ComMaxPlayTime,
+b.MfgAgeRec,
+b.NumAlternates,
+b.NumExpansions,
+b.NumImplementations,
+b.Family,
+b.RankInboardgame,
+b.RankInstrategygames,
+b.RankInfamilygames,
+b.RankInthematic,
+c.Category AS Category,
+b.ImagePath
+FROM GameCategory AS gc
+INNER JOIN Category AS c ON gc.Category = c.CategoryID
+INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
+ORDER BY b.Name";
 
     <!-- category buttons query -->
     var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
@@ -66,13 +66,10 @@
                 overflow-y: auto;
             }
 
-
             .card img {
                 max-height: 200px;
                 object-fit: cover;
             }
-
-
 
             .category-buttons {
                 margin-top: 15px;
@@ -95,8 +92,6 @@
                     }
         </style>
 
-
-
         <div class="container">
             <h1>Board Games</h1>
 
@@ -109,6 +104,8 @@
             <!-- category filter buttons -->
             <div class="category-buttons">
                 <b>Filter by Category:</b><br />
+                <!-- All button -->
+                <button class="category-btn active" data-category="All">All</button>
                 @foreach (var row in categories)
                 {
                     <button class="category-btn" data-category="@row.Category">@row.Category</button>
@@ -233,13 +230,13 @@
                     // table filter
                     $("#content tr").each(function () {
                         var cat = $(this).data("category");
-                        $(this).toggle(cat === selected || selected === "All");
+                        $(this).toggle(selected === "All" || cat === selected);
                     });
 
                     // card filter
                     $("#cardContent .card-item").each(function () {
                         var cat = $(this).data("category");
-                        $(this).toggle(cat === selected || selected === "All");
+                        $(this).toggle(selected === "All" || cat === selected);
                     });
                 });
 
@@ -288,7 +285,7 @@
 
             </script>
 
-            
+
         </div>
     </head>
     <body>
