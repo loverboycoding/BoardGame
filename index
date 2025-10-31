@@ -12,6 +12,7 @@
 
     var selectQueryString = @"
 SELECT
+b.BGGId,
 b.Name,
 b.Description,
 b.YearPublished,
@@ -42,9 +43,9 @@ INNER JOIN Category AS c ON gc.Category = c.CategoryID
 INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
 ORDER BY b.Name";
 
-    <!-- category buttons query -->
-    var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
-    var categories = db.Query(categoryQuery);
+<!-- category buttons query -->
+var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
+var categories = db.Query(categoryQuery);
 }
 
 <main>
@@ -206,12 +207,10 @@ ORDER BY b.Name";
                                 <ul class="list-group list-group-flush text-start">
                                     <li class="list-group-item"><b>Year:</b> @row.YearPublished</li>
                                     <li class="list-group-item"><b>Players:</b> @row.MinPlayers - @row.MaxPlayers</li>
-                                    <li class="list-group-item"><b>Age Rec:</b> @row.ComAgeRec</li>
-                                    <li class="list-group-item"><b>Playtime:</b> @row.MfgPlaytime</li>
-                                    <li class="list-group-item"><b>Family:</b> @row.Family</li>
-                                    <li class="list-group-item"><b>Category:</b> @row.Category</li>
-                                    <li class="list-group-item"><b>Rank:</b> @row.RankInboardgame</li>
                                 </ul>
+
+                                <!-- Button for going to detail page -->
+                                <a href="/Home/Details?id=@row.BGGId" class="btn btn-primary">View details</a>
                             </div>
                         </div>
                     }
