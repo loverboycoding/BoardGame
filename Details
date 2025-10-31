@@ -1,0 +1,77 @@
+
+@{
+    ViewBag.Title = "Detail";
+}
+
+@using WebMatrix.Data
+
+@{
+    // Open the database
+    var db = Database.Open("BoardGame");
+
+    // Get the BGGId passed from the index page (e.g., /Home/Details?id=5)
+    var bggId = Request.QueryString["id"];
+
+    // Query to get that one game's details
+    var selectQueryString = @"
+SELECT
+b.BGGId,
+b.Name,
+b.Description,
+b.YearPublished,
+b.MinPlayers,
+b.MaxPlayers,
+b.ComAgeRec,
+b.LanguageEase,
+b.BestPlayers,
+b.NumOwned,
+b.NumWant,
+b.NumWish,
+b.MfgPlaytime,
+b.ComMinPlayTime,
+b.ComMaxPlayTime,
+b.MfgAgeRec,
+b.NumAlternates,
+b.NumExpansions,
+b.NumImplementations,
+b.Family,
+b.RankInboardgame,
+b.RankInstrategygames,
+b.RankInfamilygames,
+b.RankInthematic,
+c.Category AS Category,
+b.ImagePath
+FROM GameCategory AS gc
+INNER JOIN Category AS c ON gc.Category = c.CategoryID
+INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
+WHERE b.BGGId = @0";
+
+    var game = db.QuerySingle(selectQueryString, bggId);
+}
+
+    <div id="cardView" class="container my-5">
+        <div id="cardContent" class="row justify-content-center">
+            <div class="col-md-4 d-flex justify-content-center mb-4 card-item" data-category="@game.Category">
+                <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
+                    <img src="@game.ImagePath" class="card-img-top" alt="@game.Name">
+
+                    <div class="card-body">
+                        <h5 class="card-title">@game.Name</h5>
+                        <p class="card-text">@game.Description</p>
+                    </div>
+
+                    <ul class="list-group list-group-flush text-start">
+                        <li class="list-group-item"><b>Year:</b> @game.YearPublished</li>
+                        <li class="list-group-item"><b>Players:</b> @game.MinPlayers - @game.MaxPlayers</li>
+                        <li class="list-group-item"><b>Age Rec:</b> @game.ComAgeRec</li>
+                        <li class="list-group-item"><b>Playtime:</b> @game.MfgPlaytime</li>
+                        <li class="list-group-item"><b>Family:</b> @game.Family</li>
+                        <li class="list-group-item"><b>Category:</b> @game.Category</li>
+                        <li class="list-group-item"><b>Rank:</b> @game.RankInboardgame</li>
+                    </ul>
+
+                    <a href="/Home/Index" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
