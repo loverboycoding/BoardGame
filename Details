@@ -64,13 +64,39 @@ WHERE b.BGGId = @0";
                 </div>
 
                 <ul class="list-group list-group-flush text-start">
-                    <li class="list-group-item"><b>Year:</b> @game.YearPublished</li>
-                    <li class="list-group-item"><b>Players:</b> @game.MinPlayers - @game.MaxPlayers</li>
-                    <li class="list-group-item"><b>Age Rec:</b> @game.ComAgeRec</li>
-                    <li class="list-group-item"><b>Playtime:</b> @game.MfgPlaytime</li>
-                    <li class="list-group-item"><b>Family:</b> @game.Family</li>
-                    <li class="list-group-item"><b>Category:</b> @game.Category</li>
-                    <li class="list-group-item"><b>Rank:</b> @game.RankInboardgame</li>
+                    @if (game.YearPublished != null)
+                    {
+                        <li class="list-group-item"><b>Year:</b> @game.YearPublished</li>
+                    }
+
+                    @if (game.MinPlayers != null && game.MaxPlayers != null)
+                    {
+                        <li class="list-group-item"><b>Players:</b> @game.MinPlayers - @game.MaxPlayers</li>
+                    }
+
+                    @if (game.ComAgeRec != null)
+                    {
+                        <li class="list-group-item"><b>Age Rec:</b> @game.ComAgeRec</li>
+                    }
+
+                    @if (game.MfgPlaytime != null)
+                    {
+                        <li class="list-group-item"><b>Playtime:</b> @game.MfgPlaytime</li>
+                    }
+
+                    @if (game.Family != null)
+                    {
+                        <li class="list-group-item"><b>Family:</b> @game.Family</li>
+                    }
+
+                    @if (game.Category != null)
+                    {
+                        <li class="list-group-item"><b>Category:</b> @game.Category</li>
+}
+
+                    @if (game.RankInboardgame != null)
+                    {<li class="list-group-item"><b>Rank:</b> @game.RankInboardgame</li>}
+                    
                     <li class="list-group-item"><b>Total Ratings:</b> @ratings.Count()</li>
                 </ul>
                 <a href="/Home/Index" class="btn btn-secondary">Back to Home</a>
