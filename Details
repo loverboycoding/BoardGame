@@ -1,4 +1,3 @@
-
 @{
     ViewBag.Title = "Detail";
 }
@@ -47,31 +46,60 @@ INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
 WHERE b.BGGId = @0";
 
     var game = db.QuerySingle(selectQueryString, bggId);
+
+    // Ratings query
+    var ratingQuery = "SELECT Username, Rating, ReviewDate FROM UserRating WHERE BGGId = @0";
+    var ratings = db.Query(ratingQuery, bggId);
 }
 
-    <div id="cardView" class="container my-5">
-        <div id="cardContent" class="row justify-content-center">
-            <div class="col-md-4 d-flex justify-content-center mb-4 card-item" data-category="@game.Category">
-                <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
-                    <img src="@game.ImagePath" class="card-img-top" alt="@game.Name">
+<div id="cardView" class="container my-5">
+    <div id="cardContent" class="row justify-content-left">
+        <div class="col-md-4 d-flex justify-content-left mb-4 card-item" data-category="@game.Category">
+            <div class="card shadow-sm" style="width: 20rem; min-height: 100%;">
+                <img src="@game.ImagePath" class="card-img-top" alt="@game.Name">
 
-                    <div class="card-body">
-                        <h5 class="card-title">@game.Name</h5>
-                        <p class="card-text">@game.Description</p>
-                    </div>
-
-                    <ul class="list-group list-group-flush text-start">
-                        <li class="list-group-item"><b>Year:</b> @game.YearPublished</li>
-                        <li class="list-group-item"><b>Players:</b> @game.MinPlayers - @game.MaxPlayers</li>
-                        <li class="list-group-item"><b>Age Rec:</b> @game.ComAgeRec</li>
-                        <li class="list-group-item"><b>Playtime:</b> @game.MfgPlaytime</li>
-                        <li class="list-group-item"><b>Family:</b> @game.Family</li>
-                        <li class="list-group-item"><b>Category:</b> @game.Category</li>
-                        <li class="list-group-item"><b>Rank:</b> @game.RankInboardgame</li>
-                    </ul>
-
-                    <a href="/Home/Index" class="btn btn-secondary">Back to Home</a>
+                <div class="card-body">
+                    <h5 class="card-title">@game.Name</h5>
+                    <p class="card-text">@game.Description</p>
                 </div>
+
+                <ul class="list-group list-group-flush text-start">
+                    <li class="list-group-item"><b>Year:</b> @game.YearPublished</li>
+                    <li class="list-group-item"><b>Players:</b> @game.MinPlayers - @game.MaxPlayers</li>
+                    <li class="list-group-item"><b>Age Rec:</b> @game.ComAgeRec</li>
+                    <li class="list-group-item"><b>Playtime:</b> @game.MfgPlaytime</li>
+                    <li class="list-group-item"><b>Family:</b> @game.Family</li>
+                    <li class="list-group-item"><b>Category:</b> @game.Category</li>
+                    <li class="list-group-item"><b>Rank:</b> @game.RankInboardgame</li>
+                    <li class="list-group-item"><b>Total Ratings:</b> @ratings.Count()</li>
+                </ul>
+                <a href="/Home/Index" class="btn btn-secondary">Back to Home</a>
             </div>
         </div>
     </div>
+</div>
+
+<!-- table for rating details -->
+<div class="table-wrapper mt-3">
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Rating</th>
+                <th>Review Date</th>
+            </tr>
+        </thead>
+
+        <!-- printing rating details -->
+        <tbody>
+            @foreach (var row in ratings)
+            {
+                <tr>
+                    <td>@row.Username</td>
+                    <td>@row.Rating</td>
+                    <td>@row.ReviewDate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
