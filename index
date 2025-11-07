@@ -36,16 +36,16 @@ b.RankInboardgame,
 b.RankInstrategygames,
 b.RankInfamilygames,
 b.RankInthematic,
-c.Category AS Category,
+COALESCE(c.Category, 'Uncategorized') AS Category,
 b.ImagePath
-FROM GameCategory AS gc
-INNER JOIN Category AS c ON gc.Category = c.CategoryID
-INNER JOIN BoardGame AS b ON gc.BGGId = b.BGGId
+FROM BoardGame AS b
+LEFT JOIN GameCategory AS gc ON b.BGGId = gc.BGGId
+LEFT JOIN Category AS c ON gc.Category = c.CategoryID
 ORDER BY b.Name";
 
 <!-- category buttons query -->
-var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
-var categories = db.Query(categoryQuery);
+    var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
+    var categories = db.Query(categoryQuery);
 }
 
 <main>
