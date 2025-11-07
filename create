@@ -1,0 +1,70 @@
+
+@{
+    ViewBag.Title = "Create";
+}
+
+@using WebMatrix.Data
+
+@{
+
+    //connect to database
+    var db = Database.Open("BoardGame");
+    var message = "";
+
+    if (IsPost)
+    {
+        // Collect form values
+        var name = Request["Name"];
+        var description = Request["Description"];
+        var year = Request["YearPublished"];
+        var minPlayers = Request["MinPlayers"];
+        var maxPlayers = Request["MaxPlayers"];
+
+        // Insert into database
+        db.Execute(@"INSERT INTO BoardGame (Name, Description, YearPublished, MinPlayers, MaxPlayers)
+     VALUES (@0, @1, @2, @3, @4)",
+                     name, description, year, minPlayers, maxPlayers);
+
+        message = "Game successfully added!";
+    }
+}
+
+<h2>Add New Board Game</h2>
+
+@if (!String.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<form method="post">
+    <div>
+        <label>Game Name:</label><br />
+        <input type="text" name="Name" required />
+    </div>
+
+    <div>
+        <label>Description:</label><br />
+        <textarea name="Description"></textarea>
+    </div>
+
+    <div>
+        <label>Year Published:</label><br />
+        <input type="number" name="YearPublished" />
+    </div>
+
+    <div>
+        <label>Min Players:</label><br />
+        <input type="number" name="MinPlayers" />
+    </div>
+
+    <div>
+        <label>Max Players:</label><br />
+        <input type="number" name="MaxPlayers" />
+    </div>
+
+    <br />
+    <button type="submit">Add Game</button>
+</form>
+
+
+
