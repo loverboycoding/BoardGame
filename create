@@ -1,4 +1,3 @@
-
 @{
     ViewBag.Title = "Create";
 }
@@ -11,19 +10,42 @@
     var db = Database.Open("BoardGame");
     var message = "";
 
+    var fam = db.Query("select * from GameFamily order by Family asc");
+
+    var theme = db.Query("select * from Theme order by ThemeName asc");
+
     if (IsPost)
     {
         // Collect form values
         var name = Request["Name"];
         var description = Request["Description"];
+        var Family = Request["Family"];
+        var NewFamily = Request["NewFamily"];
+        var Theme = Request["Theme"];
+        var NewTheme = Request["NewTheme"];
         var year = Request["YearPublished"];
         var minPlayers = Request["MinPlayers"];
         var maxPlayers = Request["MaxPlayers"];
 
+        //create new bgg id
+        var nextId = db.QueryValue("Select isnull(max(BGGId),0) +1 From BoardGame");
+
+        //for new family if selected
+        if (Family == "New")
+        {
+            Family = NewFamily;
+        }
+
+        //for new theme if selected
+        if (Theme == "NewTheme")
+        {
+            Theme = NewTheme;
+        }
+
         // Insert into database
-        db.Execute(@"INSERT INTO BoardGame (Name, Description, YearPublished, MinPlayers, MaxPlayers)
-     VALUES (@0, @1, @2, @3, @4)",
-                     name, description, year, minPlayers, maxPlayers);
+        db.Execute(@"INSERT INTO BoardGame (BGGId,Name, Description, Family, ThemeName, YearPublished, MinPlayers, MaxPlayers)
+VALUES (@0, @1, @2, @3, @4, @5, @6, @7)",
+             nextId, name, description, Family, Theme, year, minPlayers, maxPlayers);
 
         message = "Game successfully added!";
     }
@@ -36,15 +58,49 @@
     <div class="alert alert-success">@message</div>
 }
 
-<form method="post">
+<form method="post" action="">
     <div>
         <label>Game Name:</label><br />
-        <input type="text" name="Name" required />
+        <input type="text" name="Name" class="form-control" required />
     </div>
 
     <div>
         <label>Description:</label><br />
         <textarea name="Description"></textarea>
+    </div>
+
+    <div>
+        <label for="Family">Select Existing Family:</label>
+        <select id="Family" name="Family" class="form-control">
+            <option value="">-- None --</option>
+            @foreach (var row in fam)
+            {
+                <option value="@row.Family">@row.Family</option>
+            }
+            <option value="New">Add New Family...</option>
+        </select>
+    </div>
+
+    <div id="newFamilyInput" style="display:none;">
+        <label for="NewFamily">New Family Name:</label>
+        <input type="text" id="NewFamily" name="NewFamily" class="form-control" />
+    </div>
+
+    <div>
+        <label for="Theme">Select existing theme:</label>
+        <select id="Theme" name="Theme" class="form-control">
+            <option value="">-- None --</option>
+            @foreach (var row in theme)
+            {
+                <option value="@row.ThemeName">@row.ThemeName</option>
+            }
+            <option value="NewTheme">Add New Theme...</option>
+        </select>
+    </div>
+
+    <div id="newThemeInput" style="display:none;">
+        <label for="NewTheme">New Theme Name:</label>
+        <input type="text" id="NewTheme" name="NewTheme" class="form-control" />
     </div>
 
     <div>
@@ -63,8 +119,25 @@
     </div>
 
     <br />
-    <button type="submit">Add Game</button>
+    <button type="submit" class="btn btn-primary">Add Game</button>
 </form>
 
+<!--show/hide new family field -->
+<script>
+    document.getElementById("Family").addEventListener("change", function () {
+        if (this.value === "New") {
+            document.getElementById("newFamilyInput").style.display = "block";
+        } else {
+            document.getElementById("newFamilyInput").style.display = "none";
+        }
+    });</script>
 
-
+<!--show/hide new theme field -->
+<script>
+    document.getElementById("Theme").addEventListener("change", function () {
+        if (this.value === "NewTheme") {
+            document.getElementById("newThemeInput").style.display = "block";
+        } else {
+            document.getElementById("newThemeInput").style.display = "none";
+        }
+    });</script>
