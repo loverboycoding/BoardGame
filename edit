@@ -1,0 +1,78 @@
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+@using WebMatrix.Data
+
+@{
+    //connect to database
+    var db = Database.Open("BoardGame");
+
+    //get id from query string (e.g., /Home/Edit?id=3)
+    var bggId = Request.QueryString["id"];
+
+    //fetch the selected game details
+    var game = db.QuerySingle("SELECT * FROM BoardGame WHERE BGGId = @0", bggId);
+
+    var fam = db.Query("select * from GameFamily order by Family asc");
+    var theme = db.Query("select * from Theme order by ThemeName asc");
+}
+
+<h2>Edit Board Game</h2>
+
+@if (game == null)
+{
+    <div class="alert alert-danger">Game not found.</div>
+}
+else
+{
+    <!-- display form with current values prefilled -->
+    <form method="post" action="">
+        <div>
+            <label>Game Name:</label><br />
+            <input type="text" name="Name" class="form-control" value="@game.Name" readonly />
+        </div>
+
+        <div>
+            <label>Description:</label><br />
+            <textarea name="Description" class="form-control">@game.Description</textarea>
+        </div>
+
+        <div>
+            <label for="Family">Family:</label>
+            <select id="Family" name="Family" class="form-control">
+                <option value="">-- None --</option>
+                @foreach (var row in fam)
+                {
+                    <option value="@row.Family" @(row.Family == game.Family ? "selected" : "")>@row.Family</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>Year Published:</label><br />
+            <input type="number" name="YearPublished" class="form-control" value="@(game.YearPublished != null ? ((DateTime)game.YearPublished).Year.ToString() : "")" />
+        </div>
+
+        <div>
+            <label>Min Players:</label><br />
+            <input type="number" name="MinPlayers" class="form-control" value="@game.MinPlayers" />
+        </div>
+
+        <div>
+            <label>Max Players:</label><br />
+            <input type="number" name="MaxPlayers" class="form-control" value="@game.MaxPlayers" />
+        </div>
+
+        <div>
+            <label>Category:</label><br />
+            <input type="text" name="Category" class="form-control" value="@game.Family" readonly />
+        </div>
+
+        <br />
+        <a href="/Home/Index" class="btn btn-secondary">Back to Home</a>
+    </form>
+}
+
