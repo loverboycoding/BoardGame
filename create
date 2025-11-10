@@ -11,7 +11,6 @@
     var message = "";
 
     var fam = db.Query("select * from GameFamily order by Family asc");
-
     var theme = db.Query("select * from Theme order by ThemeName asc");
 
     if (IsPost)
@@ -34,18 +33,37 @@
         if (Family == "New")
         {
             Family = NewFamily;
+
+            //check if family already exists, if not insert it
+            var checkFam = db.QueryValue("SELECT COUNT(*) FROM GameFamily WHERE Family = @0", Family);
+            if (checkFam == 0)
+            {
+                //create FamilyCode like 'F1', 'F2', etc.
+                var nextFamCode = db.QueryValue("SELECT 'F' + CAST(ISNULL(COUNT(*),0) + 1 AS NVARCHAR) FROM GameFamily");
+                db.Execute("INSERT INTO GameFamily (FamilyCode, Family) VALUES (@0, @1)", nextFamCode, Family);
+            }
         }
 
         //for new theme if selected
         if (Theme == "NewTheme")
         {
             Theme = NewTheme;
+
+            //check if theme already exists
+            var checkTheme = db.QueryValue("SELECT COUNT(*) FROM Theme WHERE ThemeName = @0", Theme);
+            if (checkTheme == 0)
+            {
+                //create new ThemeID like 'T1', 'T2', etc.
+                var nextThemeId = db.QueryValue("SELECT 'T' + CAST(ISNULL(COUNT(*),0) + 1 AS NVARCHAR) FROM Theme");
+                db.Execute("INSERT INTO Theme (ThemeID, ThemeName) VALUES (@0, @1)", nextThemeId, Theme);
+            }
         }
 
         // Insert into database
-        db.Execute(@"INSERT INTO BoardGame (BGGId,Name, Description, Family, ThemeName, YearPublished, MinPlayers, MaxPlayers)
-VALUES (@0, @1, @2, @3, @4, @5, @6, @7)",
-             nextId, name, description, Family, Theme, year, minPlayers, maxPlayers);
+        db.Execute(@"INSERT INTO BoardGame
+             (BGGId, Name, Description, Family, YearPublished, MinPlayers, MaxPlayers)
+             VALUES (@0, @1, @2, @3, @4, @5, @6)",
+             nextId, name, description, Family, year, minPlayers, maxPlayers);
 
         message = "Game successfully added!";
     }
@@ -130,7 +148,8 @@ VALUES (@0, @1, @2, @3, @4, @5, @6, @7)",
         } else {
             document.getElementById("newFamilyInput").style.display = "none";
         }
-    });</script>
+    });
+</script>
 
 <!--show/hide new theme field -->
 <script>
@@ -140,4 +159,5 @@ VALUES (@0, @1, @2, @3, @4, @5, @6, @7)",
         } else {
             document.getElementById("newThemeInput").style.display = "none";
         }
-    });</script>
+    });
+</script>
