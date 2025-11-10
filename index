@@ -44,8 +44,8 @@ LEFT JOIN Category AS c ON gc.Category = c.CategoryID
 ORDER BY b.Name";
 
 <!-- category buttons query -->
-    var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
-    var categories = db.Query(categoryQuery);
+var categoryQuery = "SELECT DISTINCT Category FROM Category ORDER BY Category";
+var categories = db.Query(categoryQuery);
 }
 
 <main>
@@ -126,6 +126,7 @@ ORDER BY b.Name";
                     <table class="table table-striped table-hover table-bordered align-middle">
                         <thead>
                             <tr>
+                                <th>edit</th>
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Year Published</th>
@@ -151,6 +152,7 @@ ORDER BY b.Name";
                                 <th>RankInthematic</th>
                                 <th>Category</th>
                                 <th>Image</th>
+
                             </tr>
                         </thead>
 
@@ -158,6 +160,7 @@ ORDER BY b.Name";
                             @foreach (var row in db.Query(selectQueryString))
                             {
                                 <tr data-category="@row.Category">
+                                    <td><a href="/Home/Edit?id=@row.BGGId" class="btn btn-warning btn-sm">Edit</a></td>
                                     <td>@row.Name</td>
                                     <td>@row.Description</td>
                                     <td>@row.YearPublished</td>
@@ -183,6 +186,7 @@ ORDER BY b.Name";
                                     <td>@row.RankInthematic</td>
                                     <td>@row.Category</td>
                                     <td><img src="@row.ImagePath" alt="@row.Name" style="max-width:80px; border-radius:8px;"></td>
+            
                                 </tr>
                             }
                         </tbody>
