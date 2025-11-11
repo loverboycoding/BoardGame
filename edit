@@ -1,78 +1,124 @@
-
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Edit Game";
 }
 
-<h2>Edit</h2>
 @using WebMatrix.Data
 
 @{
     //connect to database
     var db = Database.Open("BoardGame");
+    var message = "";
 
-    //get id from query string (e.g., /Home/Edit?id=3)
-    var bggId = Request.QueryString["id"];
+    //get game id from query
+    var bggId = Request["id"];
 
-    //fetch the selected game details
-    var game = db.QuerySingle("SELECT * FROM BoardGame WHERE BGGId = @0", bggId);
+    if (bggId == null)
+    {
+        <div class="alert alert-danger">No game selected.</div>
+        return;
+    }
 
-    var fam = db.Query("select * from GameFamily order by Family asc");
-    var theme = db.Query("select * from Theme order by ThemeName asc");
+    //get current game record
+    var game = db.QuerySingle("SELECT * FROM BoardGame WHERE BGGId=@0", bggId);
+
+    if (game == null)
+    {
+        <div class="alert alert-warning">Game not found.</div>
+        return;
+    }
+
+    //if user submitted the form
+    if (IsPost)
+    {
+        var name = Request["Name"];
+        var description = Request["Description"];
+        var year = Request["YearPublished"];
+        var minPlayers = Request["MinPlayers"];
+        var maxPlayers = Request["MaxPlayers"];
+        var family = Request["Family"];
+        var confirmAdd = Request["ConfirmAdd"];
+
+        //check if the family exists
+        var famExists = db.QueryValue("SELECT COUNT(*) FROM GameFamily WHERE Family=@0", family);
+
+        if (famExists == 0 && String.IsNullOrWhiteSpace(confirmAdd))
+        {
+            //show confirmation message before actually updating
+            message = $"Family '{family}' does not exist. Do you want to add it?";
+            <form method="post">
+                <input type="hidden" name="Name" value="@name" />
+                <input type="hidden" name="Description" value="@description" />
+                <input type="hidden" name="YearPublished" value="@year" />
+                <input type="hidden" name="MinPlayers" value="@minPlayers" />
+                <input type="hidden" name="MaxPlayers" value="@maxPlayers" />
+                <input type="hidden" name="Family" value="@family" />
+                <input type="hidden" name="ConfirmAdd" value="yes" />
+                <div class="alert alert-warning">@message</div>
+                <button type="submit" class="btn btn-success">Yes, add and update</button>
+                <a href="?id=@bggId" class="btn btn-secondary">Cancel</a>
+            </form>
+            return;
+        }
+
+        //if family doesn't exist but user confirmed
+        if (famExists == 0 && confirmAdd == "yes")
+        {
+            //generate new family code
+            var newCode = Guid.NewGuid().ToString();
+            db.Execute("INSERT INTO GameFamily (FamilyCode, Family) VALUES (@0, @1)", newCode, family);
+        }
+
+        //update the game record
+        db.Execute(@"UPDATE BoardGame
+             SET Name=@0, Description=@1, YearPublished=@2,
+                 MinPlayers=@3, MaxPlayers=@4, Family=@5
+             WHERE BGGId=@6",
+                    name, description, year, minPlayers, maxPlayers, family, bggId);
+
+        message = "Game details updated successfully!";
+        game = db.QuerySingle("SELECT * FROM BoardGame WHERE BGGId=@0", bggId);
+    }
 }
 
-<h2>Edit Board Game</h2>
+<h2>Edit Game Details</h2>
 
-@if (game == null)
+@if (!String.IsNullOrEmpty(message))
 {
-    <div class="alert alert-danger">Game not found.</div>
-}
-else
-{
-    <!-- display form with current values prefilled -->
-    <form method="post" action="">
-        <div>
-            <label>Game Name:</label><br />
-            <input type="text" name="Name" class="form-control" value="@game.Name" readonly />
-        </div>
-
-        <div>
-            <label>Description:</label><br />
-            <textarea name="Description" class="form-control">@game.Description</textarea>
-        </div>
-
-        <div>
-            <label for="Family">Family:</label>
-            <select id="Family" name="Family" class="form-control">
-                <option value="">-- None --</option>
-                @foreach (var row in fam)
-                {
-                    <option value="@row.Family" @(row.Family == game.Family ? "selected" : "")>@row.Family</option>
-                }
-            </select>
-        </div>
-
-        <div>
-            <label>Year Published:</label><br />
-            <input type="number" name="YearPublished" class="form-control" value="@(game.YearPublished != null ? ((DateTime)game.YearPublished).Year.ToString() : "")" />
-        </div>
-
-        <div>
-            <label>Min Players:</label><br />
-            <input type="number" name="MinPlayers" class="form-control" value="@game.MinPlayers" />
-        </div>
-
-        <div>
-            <label>Max Players:</label><br />
-            <input type="number" name="MaxPlayers" class="form-control" value="@game.MaxPlayers" />
-        </div>
-
-        <div>
-            <label>Category:</label><br />
-            <input type="text" name="Category" class="form-control" value="@game.Family" readonly />
-        </div>
-
-        <br />
-        <a href="/Home/Index" class="btn btn-secondary">Back to Home</a>
-    </form>
+    <div class="alert alert-success">@message</div>
 }
 
+<form method="post" action="">
+    <div class="form-group">
+        <label>Game Name:</label>
+        <input type="text" name="Name" value="@game.Name" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Description:</label>
+        <textarea name="Description" class="form-control">@game.Description</textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Year Published:</label>
+        <input type="number" name="YearPublished" value="@(game.YearPublished != null ? ((DateTime)game.YearPublished).Year.ToString() : "")" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Min Players:</label>
+        <input type="number" name="MinPlayers" value="@game.MinPlayers" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Max Players:</label>
+        <input type="number" name="MaxPlayers" value="@game.MaxPlayers" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Family:</label>
+        <input type="text" name="Family" value="@game.Family" class="form-control" />
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="/Home/Index" class="btn btn-secondary">Cancel</a>
+</form>
